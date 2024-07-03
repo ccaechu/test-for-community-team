@@ -21,20 +21,26 @@ jobs:
           issue_body=$(jq -r '.issue.body' "$GITHUB_EVENT_PATH")
           issue_url=$(jq -r '.issue.html_url' "$GITHUB_EVENT_PATH")
 
+          json_payload=$(jq -n \
+            --arg project "$JIRA_PROJECT_KEY" \
+            --arg summary "$issue_title" \
+            --arg description "$issue_body\n\nGitHub Issue URL: $issue_url" \
+            --arg issuetype "Task" \
+            --arg epic_link "$JIRA_EPIC_KEY" \
+            '{
+              fields: {
+                project: { key: $project },
+                summary: $summary,
+                description: $description,
+                issuetype: { name: $issuetype },
+                customfield_10008: $epic_link
+              }
+            }')
+
+          echo "JSON Payload: $json_payload"
+
           curl -X POST \
             -H "Authorization: Basic $(echo -n $JIRA_EMAIL:$JIRA_API_TOKEN | base64)" \
             -H "Content-Type: application/json" \
-            --data '{
-              "fields": {
-                "project": {
-                  "key": "'$JIRA_PROJECT_KEY'"
-                },
-                "summary": "'$issue_title'",
-                "description": "'$issue_body\n\nGitHub Issue URL: $issue_url'",
-                "issuetype": {
-                  "name": "Task"
-                },
-                "customfield_10008": "'$JIRA_EPIC_KEY'"
-              }
-            }' \
+            --data "$json_payload" \
             $JIRA_BASE_URL/rest/api/2/issue/
