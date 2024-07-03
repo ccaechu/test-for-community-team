@@ -10,9 +10,8 @@ jobs:
 
     steps:
       - name: Set up the environment
-        run: |
-          echo "Setting up the environment..."
-      
+        run: echo "Setting up the environment..."
+
       - name: Extract issue details
         id: extract_details
         run: |
@@ -22,6 +21,13 @@ jobs:
           echo "Issue Title: $issue_title"
           echo "Issue Body: $issue_body"
           echo "Issue URL: $issue_url"
+
+      - name: Debug Secrets
+        run: |
+          echo "JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}"
+          echo "JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}"
+          echo "JIRA_PROJECT_KEY: ${{ secrets.JIRA_PROJECT_KEY }}"
+          echo "JIRA_EPIC_KEY: ${{ secrets.JIRA_EPIC_KEY }}"
 
       - name: Create Jira issue
         env:
