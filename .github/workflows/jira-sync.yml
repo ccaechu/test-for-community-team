@@ -9,11 +9,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Check environment variables
+        run: |
+          echo "JIRA_BASE_URL: ${{ env.JIRA_BASE_URL }}"
+          echo "JIRA_EMAIL: ${{ env.JIRA_EMAIL }}"
+          echo "JIRA_API_TOKEN: ${{ env.JIRA_API_TOKEN }}"
+          echo "JIRA_PROJECT_KEY: ${{ env.JIRA_PROJECT_KEY }}"
+          echo "JIRA_EPIC_KEY: ${{ env.JIRA_EPIC_KEY }}"
+
       - name: Create Jira issue
         env:
           JIRA_BASE_URL: "https://ucldata.atlassian.net"
-          JIRA_EMAIL: "ccaechu@ucl.ac.uk" # Replace with your actual Jira email
-          JIRA_API_TOKEN: "ATATT3xFfGF0UbGrCQ9Lza_4wn2yL5QIPl4sTmcuAvqZWSgdarzsxnP9ggwaUJ9y-TJzUgojLSrdebQ--2LrKyKaMSVvLIDO6xC_MuIh1ieOiXtYp12TXF0KFHN0OsH2pZHsb0vbE1pOFTkwzO-rvsr0AWXJ-nw88JiDPtLQJ9DPtQ1CMFmiehI=A3E25173" # Replace with your actual Jira API token
+          JIRA_EMAIL: "your-email@example.com" # Replace with your actual Jira email
+          JIRA_API_TOKEN: "your-api-token" # Replace with your actual Jira API token
           JIRA_PROJECT_KEY: "AC"
           JIRA_EPIC_KEY: "AC-587"
         run: |
@@ -43,7 +51,7 @@ jobs:
 
           echo "JSON Payload: $json_payload"
 
-          curl -X POST \
+          curl -v -X POST \
             -H "Authorization: Basic $(echo -n $JIRA_EMAIL:$JIRA_API_TOKEN | base64)" \
             -H "Content-Type: application/json" \
             --data "$json_payload" \
