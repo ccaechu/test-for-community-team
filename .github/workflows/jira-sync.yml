@@ -9,8 +9,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Set up the environment
-        run: echo "Setting up the environment..."
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
 
       - name: Extract issue details
         id: extract_details
@@ -18,16 +23,9 @@ jobs:
           echo "issue_title=$(jq -r '.issue.title' "$GITHUB_EVENT_PATH")" >> $GITHUB_ENV
           echo "issue_body=$(jq -r '.issue.body' "$GITHUB_EVENT_PATH")" >> $GITHUB_ENV
           echo "issue_url=$(jq -r '.issue.html_url' "$GITHUB_EVENT_PATH")" >> $GITHUB_ENV
-          echo "Issue Title: $issue_title"
-          echo "Issue Body: $issue_body"
-          echo "Issue URL: $issue_url"
 
-      - name: Debug Secrets
-        run: |
-          echo "JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}"
-          echo "JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}"
-          echo "JIRA_PROJECT_KEY: ${{ secrets.JIRA_PROJECT_KEY }}"
-          echo "JIRA_EPIC_KEY: ${{ secrets.JIRA_EPIC_KEY }}"
+      - name: Install Axios
+        run: npm install axios
 
       - name: Create Jira issue
         env:
@@ -40,26 +38,31 @@ jobs:
           ISSUE_BODY: ${{ env.issue_body }}
           ISSUE_URL: ${{ env.issue_url }}
         run: |
-          json_payload=$(jq -n \
-            --arg project "$JIRA_PROJECT_KEY" \
-            --arg summary "$ISSUE_TITLE" \
-            --arg description "$ISSUE_BODY\n\nGitHub Issue URL: $ISSUE_URL" \
-            --arg issuetype "Task" \
-            --arg epic_link "$JIRA_EPIC_KEY" \
-            '{
+          node -e "
+            const axios = require('axios');
+            const issueTitle = process.env.ISSUE_TITLE;
+            const issueBody = process.env.ISSUE_BODY + '\n\nGitHub Issue URL: ' + process.env.ISSUE_URL;
+            const auth = Buffer.from(process.env.JIRA_EMAIL + ':' + process.env.JIRA_API_TOKEN).toString('base64');
+
+            const data = {
               fields: {
-                project: { key: $project },
-                summary: $summary,
-                description: $description,
-                issuetype: { name: $issuetype },
-                customfield_10008: $epic_link
+                project: { key: process.env.JIRA_PROJECT_KEY },
+                summary: issueTitle,
+                description: issueBody,
+                issuetype: { name: 'Task' },
+                customfield_10008: process.env.JIRA_EPIC_KEY
               }
-            }')
+            };
 
-          echo "JSON Payload: $json_payload"
-
-          curl -X POST \
-            -H "Authorization: Basic $(echo -n $JIRA_EMAIL:$JIRA_API_TOKEN | base64)" \
-            -H "Content-Type: application/json" \
-            --data "$json_payload" \
-            $JIRA_BASE_URL/rest/api/2/issue/
+            axios.post(process.env.JIRA_BASE_URL + '/rest/api/2/issue/', data, {
+              headers: {
+                'Authorization': 'Basic ' + auth,
+                'Content-Type': 'application/json'
+              }
+            }).then(response => {
+              console.log('Jira issue created:', response.data.key);
+            }).catch(error => {
+              console.error('Error creating Jira issue:', error.response ? error.response.data : error.message);
+              process.exit(1);
+            });
+          "
