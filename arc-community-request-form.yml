@@ -1,0 +1,102 @@
+---
+name: ARC Community Request Form
+description: Request Form for ARC Community Team
+title: "*** New Request ***"
+labels: "New Request"
+projects: ["Community Project Board"]
+body:
+  - type: markdown
+    attributes:
+      value:
+        Details of your submission.
+  - type: input
+    id: contact
+    attributes:
+      label: Contact Details
+      description: How can we get in touch with you if we need more info?
+      placeholder: e.g. email@example.com
+    validations:
+      required: true
+  - type: dropdown
+    id: your-team
+    attributes:
+      label: Your team
+      description: Please select your team.
+      options:
+        - Bespoke Solutions
+        - CDI
+        - Collaborations 
+        - Education
+        - Environments
+        - HPC Solutions
+        - Infrastructure
+        - Ops and Admin
+        - Research Data Management
+        - Other
+    validations:
+      required: true 
+  - type: textarea
+    id: what
+    attributes:
+      label: What would you like us to help you with? (e.g. event promotion, blogging problem, create poster, asking for event organisaton)
+      description: Please provide information about what type of action you would like to help with.
+      placeholder: e.g. I would like a publication of my event on social media...
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Description to be published.
+      description: Description within the character limit required by your requested platform. Let the team (arc.community@ucl.ac.uk) know if you need help with this.
+      placeholder: e.g. The Festival of Digital Innovation is taking place...
+    validations:
+      required: true
+  - type: textarea
+    id: audience
+    attributes:
+      label: Target audience
+      description: Please provide information about the groups/departments/institutions/professions and other target audience 
+      placeholder: e.g. Researchers in Astrophysics...
+    validations:
+      required: true
+  - type: checkboxes
+    id: platforms
+    attributes:
+      label: Dissemination Platforms
+      description: Please specify on which platforms you would like your information published (you can choose multiple platforms).
+      options:
+        - label: ARC Newsletter 
+        - label: ARC Event Page (https://www.ucl.ac.uk/advanced-research-computing/community-events/events)
+        - label: ARC Main Page Carousel
+        - label: ARC Blog (https://blogs.ucl.ac.uk/research-software-development/)
+        - label: LinkedIn (https://www.linkedin.com/company/ucl-advanced-research-computing-centre/)
+        - label: Bluesky (https://bsky.app/profile/ucl-arc.bsky.social)
+        - label: Twitter/X (https://twitter.com/ucl_arc?lang=en)
+        - label: Custom poster (please specify details in the description sections)
+        - label: Other (please specify details in the description sections)
+    validations:
+      required: true
+  - type: input
+    id: pubilcation-date
+    attributes:
+      label: Publication Date
+      description: Please enter the preferred publication date on Newsletter or social media.
+      placeholder: YYYY-MM-DD
+    validations:
+      required: true
+  - type: input
+    id: website
+    attributes:
+      label: Is there a website or registration website for your event?
+      description: Please enter the link to your website/registration website.
+      placeholder: https://...
+    validations:
+      required: false
+  - type: textarea
+    id: image
+    attributes:
+      label: An image will get you noticed!
+      description: Please provide media images to support your submission here.
+      placeholder: Please copy an image here.
+    validations:
+      required: false
